@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Simulator Aljabar Boolean & Karnaugh Map - Kelompok Pusay - Rangkaian Digital" />
+<meta name="author" content="Kelompok Pusay - Rangkaian Digital" />
+<title>Simulator Aljabar Boolean & Karnaugh Map - Kelompok Pusay</title>
+<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="style-anime.css">
+</head>
+<body data-theme="dark">
+  <div class="sakura-container"></div>
+  <header>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <img id="anime-avatar" src="character.png" alt="Avatar" width="64" height="64">
+    <div>
+      <h1>Simulator Aljabar Boolean & Karnaugh Map <small>— Kelompok Pusay</small></h1>
+      <small class="muted">Operator: <code>'</code>,<code>!</code>,<code>~</code>=NOT; <code>*</code>,<code>&</code>,(implicit)=AND; <code>+</code>,<code>|</code>=OR; <code>^</code>=XOR</small>
+    </div>
+  </div>
+  <button class="theme-toggle" id="theme-toggle">🌙 Dark / ☀ Light</button>
+</header>
+
+<div class="container">
+  <!-- Statistics Overview -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value" id="stat-evaluations">0</div>
+      <div class="stat-label">Evaluasi Total</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-vars">0</div>
+      <div class="stat-label">Variabel Terdeteksi</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-minterms">0</div>
+      <div class="stat-label">Minterm Aktif</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-time">0ms</div>
+      <div class="stat-label">Waktu QM Terakhir</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="card">
+      <h2>1️⃣ Ekspresi → Tabel Kebenaran & K-Map</h2>
+      
+      <div class="examples">
+        <div class="mini muted" style="width: 100%; margin-bottom: 6px;">📚 Contoh Ekspresi (klik untuk mencoba):</div>
+        <button class="example-btn" data-expr="A'B + AC" title="Ekspresi sederhana 2 variabel">F₁: A'B + AC</button>
+        <button class="example-btn" data-expr="A(B+C)" title="Ekspansi distributif">F₂: A(B+C)</button>
+        <button class="example-btn" data-expr="(A^B)C + A'B'" title="XOR dengan tambahan">F₃: (A⊕B)C + A'B'</button>
+        <button class="example-btn" data-expr="(A+B)*(C+D)" title="4 variabel SOP">F₄: (A+B)(C+D)</button>
+        <button class="example-btn" data-expr="A'B' + AB" title="XNOR pattern">F₅: A'B' + AB</button>
+        <button class="example-btn" data-expr="A^B^C" title="3-way XOR">F₆: A⊕B⊕C</button>
+        <button class="example-btn" data-expr="(A+B'C')(A'+C)" title="Mixed operators">F₇: (A+B'C')(A'+C)</button>
+        <button class="example-btn" data-expr="~(A*B) + C" title="NAND gate">F₈: (AB)' + C</button>
+        <button class="example-btn" data-expr="AB + AC + BC" title="Majority function">F₉: AB+AC+BC</button>
+        <button class="example-btn" data-expr="(A+B+C)(A'+B)(B+C')" title="POS form">F₁₀: (A+B+C)(A'+B)(B+C')</button>
+      </div>
+      
+      <div class="field">
+        <label for="expr">
+          Ekspresi Boolean
+          <span class="tooltip-icon" data-tip="Masukkan ekspresi dengan variabel A-D. Gunakan operator: ' ! ~ untuk NOT, * & untuk AND, + | untuk OR, ^ untuk XOR, () untuk prioritas">?</span>
+        </label>
+        <input id="expr" type="text" placeholder="Misal: A'B + AC + B(C^D)" value="A'B + AC" autocomplete="off"/>
+        <div id="error-message" class="error-message"></div>
+        <div id="success-message" class="success-message"></div>
+      </div>
+      
+      <div class="actions">
+        <button id="btn-eval">⚡ Evaluasi Ekspresi</button>
+        <button id="btn-clear" class="secondary">🗑 Bersihkan Semua</button>
+        <button id="btn-validate" class="secondary">✓ Validasi Sintaks</button>
+      </div>
+      
+      <div class="sep"></div>
+      
+      <div class="legend">
+        <span class="pill" id="vars-pill">Variabel: —</span>
+        <span class="pill" id="minterms-pill">Minterm: —</span>
+      </div>
+      <div class="benchmark" id="benchmark" style="display: none;">
+        <span>⏱ <b id="bench-time">—</b></span>
+        <span>📊 <b id="bench-cells">—</b></span>
+        <span>🎯 <b id="bench-complexity">—</b></span>
+      </div>
+      
+      <h3 class="muted" style="margin:14px 0 8px; font-size: 14px; font-weight: 600;">📋 Tabel Kebenaran</h3>
+      <div class="tt"><table id="ttbl"><thead></thead><tbody></tbody></table></div>
+    </div>
+
+    <div class="card">
+      <h2>2️⃣ Karnaugh Map (K-Map)
+        <span class="tooltip-icon" data-tip="Klik sel untuk toggle: 0→1→d→0. Sel hijau=1 (on), kuning=d (don't care), abu=0 (off). K-Map menggunakan Gray code untuk minimasi optimal">?</span>
+      </h2>
+      
+      <div class="state-legend">
+        <div class="state-box">
+          <div class="state-sample" style="background: var(--off);"></div>
+          <span>0 (Off)</span>
+        </div>
+        <div class="state-box">
+          <div class="state-sample" style="background: var(--on);"></div>
+          <span>1 (On)</span>
+        </div>
+        <div class="state-box">
+          <div class="state-sample" style="background: var(--dc);"></div>
+          <span>d (Don't Care)</span>
+        </div>
+      </div>
+      
+      <div class="gridwrap">
+        <div class="gridlabels">
+          <div class="klabel">📍 Baris:</div>
+          <div class="klabel" id="rowlabel">—</div>
+        </div>
+        <div class="gridlabels">
+          <div class="klabel">📍 Kolom:</div>
+          <div class="klabel" id="collabel">—</div>
+        </div>
+      </div>
+      
+      <div id="kmap" class="kmap"></div>
+      
+      <div class="mode-toggle" style="margin: 12px 0;">
+        <button id="mode-sop" class="active">📐 SOP Mode</button>
+        <button id="mode-pos">📏 POS Mode</button>
+      </div>
+      
+      <div class="actions">
+        <button id="btn-simplify">✨ Sederhanakan (QM)</button>
+        <button id="btn-reset" class="secondary">↻ Reset K-Map</button>
+        <button id="btn-export-img" class="secondary">📷 Export PNG</button>
+      </div>
+      
+      <div class="field" style="margin-top:12px">
+        <label id="result-label">🎯 Hasil Penyederhanaan (SOP)
+          <span class="tooltip-icon" data-tip="Hasil minimasi menggunakan algoritma Quine-McCluskey dengan essential prime implicants dan greedy covering">?</span>
+        </label>
+        <div id="out-simplified" class="code">—</div>
+      </div>
+      
+      <div class="field">
+        <label id="minterm-label">
+          📥 Import/Export Minterm
+          <span class="tooltip-icon" data-tip="Format: 0,1,5,7 untuk minterm biasa. Tambahkan +d(2,3) untuk don't care pada indeks 2 dan 3. Contoh lengkap: 1,3,5,7+d(2,4)">?</span>
+        </label>
+        <input id="minterm-io" type="text" placeholder="Contoh: 0,1,2,5,7 atau 1,3,5+d(2,4)" autocomplete="off"/>
+        <div class="actions">
+          <button id="btn-import" class="secondary">📥 Impor → K-Map</button>
+          <button id="btn-export" class="secondary">📤 Ekspor dari K-Map</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>📖 Dokumentasi & Petunjuk Penggunaan</h2>
+    <div class="help-section">
+      <h4>🚀 Cara Menggunakan Simulator:</h4>
+      <ul>
+        <li><b>Input Ekspresi:</b> Ketik ekspresi Boolean di kotak input atau klik salah satu contoh yang tersedia</li>
+        <li><b>Operator yang Didukung:</b>
+          <ul style="margin-top: 4px;">
+            <li>NOT: <code>'</code> (postfix), <code>!</code> <code>~</code> (prefix)</li>
+            <li>AND: <code>*</code> <code>&</code> atau penulisan implisit (AB = A*B)</li>
+            <li>OR: <code>+</code> <code>|</code></li>
+            <li>XOR: <code>^</code></li>
+            <li>Tanda kurung: <code>( )</code> untuk mengatur prioritas operasi</li>
+          </ul>
+        </li>
+        <li><b>Evaluasi:</b> Klik tombol "⚡ Evaluasi Ekspresi" untuk generate tabel kebenaran dan K-Map otomatis</li>
+        <li><b>K-Map Interaktif:</b> Klik sel untuk toggle nilai (0 → 1 → d → 0). Nilai 'd' adalah don't care untuk optimasi</li>
+        <li><b>Mode SOP/POS:</b> Pilih mode Sum of Products (SOP) atau Product of Sums (POS) sesuai kebutuhan</li>
+        <li><b>Penyederhanaan:</b> Algoritma Quine-McCluskey otomatis mencari bentuk minimal dengan essential prime implicants</li>
+        <li><b>Import/Export:</b> Impor daftar minterm (format: 0,1,5,7) atau ekspor konfigurasi K-Map saat ini</li>
+        <li><b>Export PNG:</b> Simpan visualisasi K-Map sebagai gambar PNG untuk dokumentasi</li>
+      </ul>
+    </div>
+    
+    <div class="help-section">
+      <h4>⚙ Spesifikasi Teknis & Batasan:</h4>
+      <ul>
+        <li><b>Variabel:</b> Mendukung hingga 8 variabel (A-H) untuk tabel kebenaran</li>
+        <li><b>K-Map:</b> Visualisasi optimal untuk 1-4 variabel dengan Gray code ordering</li>
+        <li><b>Algoritma:</b> Quine-McCluskey untuk minimasi SOP/POS dengan kompleksitas O(3ⁿ×n²)</li>
+        <li><b>Parser:</b> Shunting-yard algorithm untuk konversi infix ke RPN (Reverse Polish Notation)</li>
+        <li><b>Don't Care:</b> Dukungan penuh untuk kondisi don't care dalam proses minimasi</li>
+        <li><b>Validasi:</b> Error handling komprehensif dengan pesan error yang informatif</li>
+        <li><b>Performance:</b> Benchmark waktu eksekusi algoritma QM untuk analisis kompleksitas</li>
+      </ul>
+    </div>
+
+    <div class="help-section">
+      <h4>📚 Referensi & Teori:</h4>
+      <ul>
+        <li><b>Aljabar Boolean:</b> Sistem matematika untuk analisis logika digital dengan operasi AND, OR, NOT</li>
+        <li><b>Karnaugh Map:</b> Metode grafis untuk penyederhanaan fungsi Boolean hingga 4-6 variabel</li>
+        <li><b>Gray Code:</b> Binary numeral system dimana dua nilai berurutan berbeda hanya pada satu bit</li>
+        <li><b>Quine-McCluskey:</b> Algoritma tabulasi sistematis untuk minimasi fungsi Boolean</li>
+        <li><b>Prime Implicant:</b> Product term yang tidak bisa dikombinasikan lebih lanjut</li>
+        <li><b>Essential Prime Implicant:</b> Prime implicant yang harus ada dalam solusi minimal</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="team-banner">
+    <h2>🌸 Kelompok Pusay - Rangkaian Digital 🌸</h2>
+    <div class="team-members">
+      <div class="member-card">
+        <b>💻 Lead Developer</b><br>
+        Muhammad Rafi Nur Setiawan<br>
+        <small>NIM: 23424026</small><br>
+        <i>Algorithm Engineer & Core Developer</i>
+      </div>
+      
+      <div class="member-card">
+        <b>🎨 UI/UX Designer</b><br>
+        Sahil Abdu Shomat<br>
+        <small>NIM: 23424000</small><br>
+        <i>Interface Design & Testing</i>
+      </div>
+      
+      <div class="member-card">
+        <b>🖋️ Presentation Designer</b><br>
+        Muhammad Raihan Akbar Maulana Putra<br>
+        <small>NIM: 23424025</small><br>
+        <i>Slide Design & Documentation</i>
+      </div>
+      
+      <div class="member-card">
+        <b>🧾 Report Writer</b><br>
+        Muhammad Ilham Siroj Zahruddin<br>
+        <small>NIM: 23424036</small><br>
+        <i>Makalah & Laporan Penelitian</i>
+      </div>
+    </div>
+    <!-- Animasi kelopak sakura -->
+    <div class="sakura-petal" style="left: 10%"></div>
+    <div class="sakura-petal" style="left: 30%"></div>
+    <div class="sakura-petal" style="left: 50%"></div>
+    <div class="sakura-petal" style="left: 70%"></div>
+    <div class="sakura-petal" style="left: 90%"></div>
+  </div>
+</div>
+
+<div class="footer">
+  © 2025 Kelompok Pusay - Rangkaian Digital. Developed for Academic Purpose.<br>
+  Simulator Aljabar Boolean & Karnaugh Map with Quine-McCluskey Algorithm
+</div>
+
+<div class="char-container">
+  <div class="char-box">
+    <div class="speech-bubble">
+      <p class="greeting-text"></p>
+    </div>
+    <img src="character.png" alt="Anime Character" class="char-img">
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

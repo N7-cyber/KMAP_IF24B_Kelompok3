@@ -1,0 +1,395 @@
+/* Anime Character Container */
+.char-container {
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+/* Character Box with Float Animation */
+.char-box {
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+  width: 280px; /* Perbesar dari ukuran sebelumnya */
+  height: 280px; /* Perbesar dari ukuran sebelumnya */
+  z-index: 1000;
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Character Image */
+.char-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 15px rgba(255, 78, 205, 0.3));
+  animation: float 3s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+/* Speech Bubble */
+.speech-bubble {
+  position: absolute;
+  left: -280px; /* Sesuaikan dengan ukuran karakter baru */
+  bottom: 120px;
+  width: 250px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(56, 189, 248, 0.2);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+}
+
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  right: -10px;
+  bottom: 20px;
+  border-left: 12px solid rgba(255, 255, 255, 0.95);
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+}
+
+.speech-bubble.show {
+  animation: bubbleIn 0.5s ease forwards;
+}
+
+.speech-bubble.hide {
+  animation: bubbleOut 0.5s ease forwards;
+}
+
+.greeting-text {
+  margin: 0;
+  color: #333;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0) scale(1); 
+  }
+  50% { 
+    transform: translateY(-15px) scale(1.02);
+  }
+}
+
+@keyframes bubbleIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bubbleOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+/* Dark Theme Adjustments */
+[data-theme="dark"] .speech-bubble {
+  background: rgba(30, 41, 59, 0.95);
+}
+
+[data-theme="dark"] .speech-bubble::after {
+  border-left-color: rgba(30, 41, 59, 0.95);
+}
+
+[data-theme="dark"] .greeting-text {
+  color: #fff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .char-box {
+    width: 150px; /* smaller on mobile but still bigger than original */
+    height: 150px;
+  }
+  
+  .speech-bubble {
+    left: -180px;
+    width: 160px;
+    padding: 12px;
+  }
+}
+
+/* Sakura Animation */
+.sakura-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.sakura {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #ffd7e6;
+  border-radius: 12px 0px;
+  filter: drop-shadow(0 0 3px rgba(255, 192, 203, 0.5));
+  opacity: 0.7;
+}
+
+/* Create petals using pseudo-elements */
+.sakura::before,
+.sakura::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: inherit;
+  border-radius: 12px 0px;
+}
+
+.sakura::before {
+  transform: rotate(30deg);
+}
+
+.sakura::after {
+  transform: rotate(-30deg);
+}
+
+/* Variety of pink colors */
+.sakura:nth-child(2n) {
+  background: #ffb7c5;
+}
+.sakura:nth-child(3n) {
+  background: #ff69b4;
+}
+.sakura:nth-child(4n) {
+  background: #ff91a4;
+}
+
+/* Fall animation */
+@keyframes fall {
+  0% {
+    opacity: 0;
+    transform: translate(0, -10px) rotate(0deg) scale(0.8);
+  }
+  25% {
+    opacity: 0.7;
+    transform: translate(100px, 25vh) rotate(90deg) scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translate(-50px, 50vh) rotate(180deg) scale(0.9);
+  }
+  75% {
+    opacity: 0.7;
+    transform: translate(100px, 75vh) rotate(270deg) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-100px, 100vh) rotate(360deg) scale(0.8);
+  }
+}
+
+/* Add floating animation */
+.sakura {
+  animation: 
+    fall linear infinite,
+    floating ease-in-out infinite alternate;
+}
+
+@keyframes floating {
+  from { margin-left: -10px; }
+  to { margin-left: 10px; }
+}
+
+/* Team Banner */
+.team-banner {
+  background: linear-gradient(135deg, #ffd6e7, #ffb6c1);
+  border-radius: 15px;
+  padding: 20px;
+  margin: 20px 0;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(255, 107, 136, 0.3);
+  border: 2px solid #ff69b4;
+}
+
+.team-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffb6c1"><path d="M12,2L9.1,7.5L3,8.3l4.5,4.4L6.6,19L12,16l5.4,3l-0.9-6.3l4.5-4.4l-6.1-0.8L12,2z"/></svg>');
+  background-size: 50px;
+  opacity: 0.1;
+}
+
+.team-banner h2 {
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: #d4367a;  /* Warna lebih gelap untuk kontras */
+  margin: 0 0 15px 0;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+  font-weight: bold;
+  font-size: 1.8em;
+  letter-spacing: 0.5px;
+}
+
+.team-members {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.member-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  padding: 15px;
+  position: relative;
+  transition: transform 0.3s ease;
+  border: 1px solid #ff69b4;
+  box-shadow: 0 2px 8px rgba(255, 105, 180, 0.2);
+  color: #000000; /* Menambahkan warna hitam untuk teks */
+}
+
+.member-card:hover {
+  transform: translateY(-5px);
+}
+
+.member-card b {
+  color: #d4367a;  /* Tetap pink tua untuk heading */
+  font-size: 1.1em;
+}
+
+.member-card small {
+  color: #333333; /* Mengubah ke hitam yang lebih soft */
+  display: block;
+  margin: 4px 0;
+}
+
+.member-card i {
+  color: #666666; /* Mengubah ke abu-abu gelap */
+  font-size: 0.9em;
+}
+
+.sakura-petal {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background: #ffd6e7;
+  border-radius: 15px 0px;
+  animation: falling 10s infinite ease-in-out;
+}
+
+@keyframes falling {
+  0% { transform: translateY(-50px) rotate(0deg); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(200px) rotate(360deg); opacity: 0; }
+}
+
+/* Documentation Section Styling */
+.help-section {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  padding: 20px;
+  margin: 15px 0;
+  border: 2px solid #ffa6c9;
+  box-shadow: 0 4px 15px rgba(255, 166, 201, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.help-section h4 {
+  color: #ff6b88;
+  font-size: 1.2em;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #ffe6f0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.help-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.help-section li {
+  margin: 12px 0;
+  padding-left: 25px;
+  position: relative;
+  line-height: 1.6;
+}
+
+.help-section li::before {
+  content: '🌸';
+  position: absolute;
+  left: 0;
+  transform: scale(0.8);
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .help-section {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: #ff6b88;
+}
+
+[data-theme="dark"] .help-section h4 {
+  color: #ffa6c9;
+  border-bottom-color: #ff6b88;
+}
+
+[data-theme="dark"] .help-section li {
+  color: #e1e7ef;
+}
+
+/* Hover effects */
+.help-section:hover {
+  transform: translateY(-2px);
+  transition: transform 0.3s ease;
+  box-shadow: 0 6px 20px rgba(255, 166, 201, 0.3);
+}
+
+/* Section specific icons */
+.help-section:nth-child(1) h4::before {
+  content: '🚀';
+}
+
+.help-section:nth-child(2) h4::before {
+  content: '⚙';
+}
+
+.help-section:nth-child(3) h4::before {
+  content: '📚';
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .help-section {
+    padding: 15px;
+  }
+  
+  .help-section h4 {
+    font-size: 1.1em;
+  }
+  
+  .help-section li {
+    font-size: 0.9em;
+  }
+}
